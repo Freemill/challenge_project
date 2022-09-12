@@ -1,4 +1,4 @@
-:star2: 프로젝트 진행과정을 상세하게 아주 상세하게:star2:
+:star2: 상상 속 실무와 능력껏 최대한 비슷하게.. 최신 기술을 활용해보자!:star2:
 
 ## SSR vs SPA
 
@@ -86,3 +86,192 @@ public class PostControllerTest {
 ```
 
 ***```@WebMvcTest```*** 를 사용하면 ***```MockMvc```*** 를 주입받아서 사용할 수 있다.
+
+테스트가 잘 작동한다.
+
+
+
+##### 글 등록을 간단하게 구현해보자.
+
+```
+Http Method는 
+GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD, TRACE, CONNECT (https://developer.mozilla.org/ko/docs/Web/HTTP/Methods)
+
+가 있는데 글 등록을 할 땐 당연히도 POST를 사용
+```
+
+ https://developer.mozilla.org/ko/docs/Web/HTTP/Methods/POST
+
+
+
+##### 글 등록 간단한 테스트
+
+##### PostCreate
+
+```java
+@ToString
+@Setter
+@Getter
+public class PostCreate {
+
+    private String title;
+    private String content;
+
+}
+
+```
+
+
+
+##### PostController
+
+```java
+@RestController
+@Slf4j
+public class PostController {
+
+    // 글 등록, Post Method
+    @PostMapping("/posts")
+    public String post(@RequestBody PostCreate params){
+        log.info("params = {}", params);
+        return "Hello World";
+    }
+}
+```
+
+##### PostControllerTest
+
+```java
+@WebMvcTest(PostController.class)
+public class PostControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Test
+    @DisplayName("/posts 요청시 Hello World 출력")
+    void test() throws Exception {
+        // 글 제목
+        // 글 내용
+
+        // expected
+        mockMvc.perform(post("/posts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\" : \"제목입니다.\", \"content\" : \"내용입니다.\"}")
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().string("Hello World"))
+                .andDo(print());
+    }
+
+
+}
+```
+
+
+
+
+
+##### 데이터 검증
+
+##### postCreate
+
+```java
+@ToString
+@Setter
+@Getter
+public class PostCreate {
+
+
+    @NotBlank(message = "타이틀 입력은 필수입니다.")
+    private String title;
+
+    @NotBlank(message = "내용 입력은 필수입니다.")
+    private String content;
+
+}
+```
+
+##### PostController
+
+```java
+@RestController
+@Slf4j
+public class PostController {
+
+    // 글 등록, Post Method
+    @PostMapping("/posts")
+    public Map<String, String> post(@RequestBody @Valid PostCreate params, BindingResult result) throws Exception {
+        if (result.hasErrors()) {
+            List<FieldError> fieldErrors = result.getFieldErrors();
+            FieldError firstFieldError = fieldErrors.get(0);
+            String fieldName =  firstFieldError.getField();
+            String errorMessage = firstFieldError.getDefaultMessage();
+
+            Map<String, String> error = new HashMap<>();
+            error.put(fieldName, erroxrMessage);
+
+            return error;
+        }
+        return Map.of();
+    }
+}
+```
+
+##### PostControllerTest
+
+```java
+@WebMvcTest(PostController.class)
+public class PostControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Test
+    @DisplayName("/posts 요청시 Hello World 출력")
+    void test() throws Exception {
+        // 글 제목
+        // 글 내용
+
+        // expected
+        mockMvc.perform(post("/posts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\" : \"제목입니다.\", \"content\" : \"내용입니다.\"}")
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().string("{}"))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("/posts 요청시 title 값 검증(필수)")
+    void tes2() throws Exception {
+        // 글 제목
+        // 글 내용
+
+        // expected
+//        mockMvc.perform(post("/posts")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content("{\"title\" : \"\", \"content\" : \"내용입니다.\"}")
+//                )
+//                .andExpect(status().isOk())
+//                .andExpect(content().string("Hello World"))
+//                .andDo(print());
+
+        mockMvc.perform(post("/posts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\" : null, \"content\" : \"내용입니다.\"}")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("타이틀 입력은 필수입니다."))
+                .andDo(print());
+    }
+
+
+}
+```
+
+***```jsonPath```*** 는 https://ykh6242.tistory.com/entry/MockMvc%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-REST-API%EC%9D%98-Json-Response-%EA%B2%80%EC%A6%9D 참조
+
+
+
