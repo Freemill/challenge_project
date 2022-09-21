@@ -3,6 +3,7 @@ package com.sparkstory.api.service;
 import com.sparkstory.api.domain.Post;
 import com.sparkstory.api.repository.PostRepository;
 import com.sparkstory.api.request.PostCreate;
+import com.sparkstory.api.response.PostResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,6 +42,7 @@ public class PostServiceTest {
         //then
         assertEquals(1L, postrepository.count());
         Post post = postrepository.findAll().get(0);
+
         assertEquals("제목입니다.", post.getTitle());
         assertEquals("내용입니다.", post.getContent());
     }
@@ -56,12 +58,12 @@ public class PostServiceTest {
         postrepository.save(requestPost);
 
         //when
-        Post post = postService.get(requestPost.getId());
+        PostResponse response = postService.get(requestPost.getId());
 
         //then
-        assertNotNull(post);
-        assertEquals("foo", post.getTitle());
-        assertEquals("bar", post.getContent());
+        assertNotNull(response);
+        assertEquals("foo", response.getTitle());
+        assertEquals("bar", response.getContent());
 
     }
 }

@@ -65,15 +65,6 @@ public class PostControllerTest {
     @Test
     @DisplayName("/posts 요청시 title 값 검증(필수)")
     void tes2() throws Exception {
-        // expected
-//        mockMvc.perform(post("/posts")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content("{\"title\" : \"\", \"content\" : \"내용입니다.\"}")
-//                )
-//                .andExpect(status().isOk())
-//                .andExpect(content().string("Hello World"))
-//                .andDo(print());
-
         PostCreate request = PostCreate.builder()
                 .content("내용입니다.")
                 .build();
@@ -122,7 +113,7 @@ public class PostControllerTest {
     void test4() throws Exception {
         //given
         Post post = Post.builder()
-                .title("foo")
+                .title("123456789012345")
                 .content("bar")
                 .build();
         postRepository.save(post);
@@ -132,7 +123,7 @@ public class PostControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(post.getId()))
-                .andExpect(jsonPath("$.title").value("foo"))
+                .andExpect(jsonPath("$.title").value("1234567890"))
                 .andExpect(jsonPath("$.content").value("bar"))
                 .andDo(print());
     }

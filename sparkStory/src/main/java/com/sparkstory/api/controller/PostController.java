@@ -2,17 +2,13 @@ package com.sparkstory.api.controller;
 
 import com.sparkstory.api.domain.Post;
 import com.sparkstory.api.request.PostCreate;
+import com.sparkstory.api.response.PostResponse;
 import com.sparkstory.api.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @Slf4j
@@ -28,9 +24,12 @@ public class PostController {
         postService.write(request);
     }
 
-    @GetMapping("/posts/{postId}")
-    public Post get(@PathVariable(name = "postId") Long id) {
+    // 조회 API
+    // 지난 시간 = 단건 조회 API (1개의 글 Post을 가져오는 기능)
+    // 이번 시간 = 여러개의 글을 조회 API
 
-        return  postService.get(id);
+    @GetMapping("/posts/{postId}")
+    public PostResponse get(@PathVariable Long postId) {
+        return postService.get(postId);
     }
 }
