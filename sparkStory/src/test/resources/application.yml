@@ -1,0 +1,9 @@
+spring:
+  data:
+    web:
+      pageable:
+        one-indexed-parameters: true
+
+
+
+

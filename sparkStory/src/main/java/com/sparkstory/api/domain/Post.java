@@ -1,9 +1,11 @@
 package com.sparkstory.api.domain;
 
 import lombok.*;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 import javax.persistence.*;
 
+@EntityScan
 @Entity
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter

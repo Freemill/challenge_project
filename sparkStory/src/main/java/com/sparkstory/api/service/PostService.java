@@ -6,7 +6,12 @@ import com.sparkstory.api.request.PostCreate;
 import com.sparkstory.api.response.PostResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -38,5 +43,13 @@ public class PostService {
     }
 
 
+
+
+    public List<PostResponse> getList(int page) {
+        Pageable pageable = PageRequest.of(page, 5);
+        return postRepository.findAll(pageable).stream()
+                .map(post -> new PostResponse(post))
+                .collect(Collectors.toList());
+    }
 
 }

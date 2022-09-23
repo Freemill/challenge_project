@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparkstory.api.domain.Post;
 import com.sparkstory.api.repository.PostRepository;
 import com.sparkstory.api.request.PostCreate;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.MediaType.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -128,5 +130,36 @@ public class PostControllerTest {
                 .andDo(print());
     }
 
+    @Test
+    @DisplayName("글 여러개 조회")
+    void test5() throws Exception {
+        //given
+        Post post1 = postRepository.save(Post.builder()
+                .title("title1")
+                .content("content1")
+                .build());
 
+        Post post2 = postRepository.save(Post.builder()
+                .title("title2")
+                .content("content2")
+                .build());
+
+        //expected
+        mockMvc.perform(get("/posts")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                /**
+                 * [{id: ... , title: ...}, {id: ..., title: ... }]
+                 */
+                .andExpect(jsonPath("$.length()", is(2)))
+                .andExpect(jsonPath("$[0].id").value(post1.getId()))
+                .andExpect(jsonPath("$[0].title").value("title1"))
+                .andExpect(jsonPath("$[0].content").value("content1"))
+                .andExpect(jsonPath("$[1].id").value(post2.getId()))
+                .andExpect(jsonPath("$[1].title").value("title2"))
+                .andExpect(jsonPath("$[1].content").value("content2"))
+
+                .andDo(print());
+
+    }
 }

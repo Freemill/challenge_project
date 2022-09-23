@@ -11,6 +11,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -20,11 +24,11 @@ public class PostServiceTest {
     private PostService postService;
 
     @Autowired
-    private PostRepository postrepository;
+    private PostRepository postRepository;
 
     @BeforeEach
     void clean(){
-        postrepository.deleteAll();
+        postRepository.deleteAll();
     }
 
     @Test
@@ -40,8 +44,8 @@ public class PostServiceTest {
         postService.write(postCreate);
 
         //then
-        assertEquals(1L, postrepository.count());
-        Post post = postrepository.findAll().get(0);
+        assertEquals(1L, postRepository.count());
+        Post post = postRepository.findAll().get(0);
 
         assertEquals("제목입니다.", post.getTitle());
         assertEquals("내용입니다.", post.getContent());
@@ -55,7 +59,7 @@ public class PostServiceTest {
                 .title("foo")
                 .content("bar")
                 .build();
-        postrepository.save(requestPost);
+        postRepository.save(requestPost);
 
         //when
         PostResponse response = postService.get(requestPost.getId());
@@ -66,4 +70,31 @@ public class PostServiceTest {
         assertEquals("bar", response.getContent());
 
     }
+    
+    @Test
+    @DisplayName("글 첫페이지 조회")
+    void test3(){
+        //given
+        List<Post> requestPosts = IntStream.range(0, 30)
+                .mapToObj(i -> {
+                    return Post.builder()
+                            .title("번뜩이는 제목 - " + i)
+                            .content("번뜩이는 스토리 - " + i)
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        postRepository.saveAll(requestPosts);
+
+
+        //when
+        List<PostResponse> posts = postService.getList(1);
+
+        //then
+        assertEquals(2L, posts.size());
+
+    }
+
+
+
 }
