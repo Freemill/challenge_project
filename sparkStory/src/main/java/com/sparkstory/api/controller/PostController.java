@@ -6,6 +6,7 @@ import com.sparkstory.api.response.PostResponse;
 import com.sparkstory.api.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -25,9 +26,6 @@ public class PostController {
         postService.write(request);
     }
 
-    // 조회 API
-    // 지난 시간 = 단건 조회 API (1개의 글 Post을 가져오는 기능)
-    // 이번 시간 = 여러개의 글을 조회 API
 
     @GetMapping("/posts/{postId}")
     public PostResponse get(@PathVariable Long postId) {
