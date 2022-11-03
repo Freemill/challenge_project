@@ -6,6 +6,8 @@ import com.sparkstory.api.response.PostResponse;
 import com.sparkstory.api.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,13 +29,14 @@ public class PostController {
     }
 
 
+    // 글 1개 조회
     @GetMapping("/posts/{postId}")
     public PostResponse get(@PathVariable Long postId) {
         return postService.get(postId);
     }
 
     @GetMapping("/posts")
-    public List<PostResponse> getList() {
-        return postService.getList(1);
+    public List<PostResponse> getList(Pageable pageable) {
+        return postService.getList(pageable);
     }
 }
