@@ -1,36 +1,36 @@
 package com.sparkstory.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparkstory.api.TestConfig;
 import com.sparkstory.api.domain.Post;
 import com.sparkstory.api.repository.PostRepository;
 import com.sparkstory.api.request.PostCreate;
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Assertions;
+import com.sparkstory.api.request.PostEdit;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.http.MediaType.*;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 //@WebMvcTest(PostController.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@Import(TestConfig.class)
 public class PostControllerTest {
 
     @Autowired
@@ -138,10 +138,10 @@ public class PostControllerTest {
     }
 
     @Test
-    @DisplayName("글 여러개 조회")
+    @DisplayName("페이지 0 요청시 1페이지 리턴")
     void test5() throws Exception {
         //given
-        List<Post> requestPosts = IntStream.range(1, 31)
+        List<Post> requestPosts = IntStream.range(0, 20)
                 .mapToObj(i -> {
                     return Post.builder()
                             .title("번뜩이는 제목 " + i)
@@ -152,14 +152,60 @@ public class PostControllerTest {
         postRepository.saveAll(requestPosts);
 
         //expected
-        mockMvc.perform(get("/posts?page=1&sort=id,desc&size=5")
+        mockMvc.perform(get("/posts?page=0&size=10")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()", is(5)))
-                .andExpect(jsonPath("$[0].id").value(30))
-                .andExpect(jsonPath("$[0].title").value("번뜩이는 제목 30"))
-                .andExpect(jsonPath("$[0].content").value("번뜩이는 스토리 30"))
+                .andExpect(jsonPath("$.length()", is(10)))
+                .andExpect(jsonPath("$[0].id").value(20))
+                .andExpect(jsonPath("$[0].title").value("번뜩이는 제목 19"))
+                .andExpect(jsonPath("$[0].content").value("번뜩이는 스토리 19"))
                 .andDo(print());
 
     }
+
+    @Test
+    @DisplayName("글 제목 수정")
+    void test6() throws Exception {
+        //given
+        Post post = Post.builder()
+                .title("번뜩이는 제목")
+                .content("번뜩이는 내용")
+                .build();
+
+        postRepository.save(post);
+
+        PostEdit postEdit = PostEdit.builder()
+                .title("엄청 번뜩이는 제목")
+                .content("엄청 번뜩이는 내용")
+                .build();
+
+        //expected
+        mockMvc.perform(patch("/posts/{postId}", post.getId())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(postEdit)))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("게시글 삭제")
+    void test7() throws Exception {
+        //given
+        Post post = Post.builder()
+                .title("번뜩이는 제목")
+                .content("번뜩이는 내용")
+                .build();
+
+        postRepository.save(post);
+
+
+        //expected
+        mockMvc.perform(delete("/posts/{postId}", post.getId())
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+
+
 }
