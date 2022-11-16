@@ -150,5 +150,5 @@ public class PostServiceTest {
         assertEquals(0, postRepository.count());
     }
 
-    
+
 }
