@@ -10,5 +10,9 @@
 
 
 
-**테스트 케이스 철저하게**
+**테스트 케이스 반드시 작성**
+
+![image](https://user-images.githubusercontent.com/76586084/202897635-3999f75c-7632-488b-897f-2c9378c8250b.png)
+![image](https://user-images.githubusercontent.com/76586084/202897651-80a4db13-ee4b-4ff5-8f18-5fe272eb75e2.png)
+![image](https://user-images.githubusercontent.com/76586084/202897676-ecd328a2-3c12-497c-af29-d95a59fa0ee4.png)
 
